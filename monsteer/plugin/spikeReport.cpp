@@ -19,7 +19,6 @@
 
 #include "spikeReport.h"
 
-#include <lunchbox/clock.h>
 #include <lunchbox/pluginRegisterer.h>
 #include <lunchbox/uri.h>
 

@@ -1,5 +1,5 @@
 
-/* Copyright (c) 2006-2015, Ahmet Bilgili <ahmet.bilgili@epfl.ch>
+/* Copyright (c) 2006-2017, Ahmet Bilgili <ahmet.bilgili@epfl.ch>
  *                          Juan Hernando <jhernando@fi.upm.es>
  *
  * This file is part of Monsteer <https://github.com/BlueBrain/Monsteer>
@@ -27,7 +27,9 @@
 
 #include <brion/brion.h>
 #include <brion/spikeReport.h>
-#include <lunchbox/lunchbox.h>
+
+#include <extra/sleep.h>
+#include <lunchbox/pluginRegisterer.h>
 
 #define BOOST_TEST_MODULE MONSTEER
 #include <boost/filesystem/path.hpp>
@@ -74,7 +76,7 @@ BOOST_AUTO_TEST_CASE(invoke_invalid_method_streaming)
 {
     brion::SpikeReport emitter{uri, brion::MODE_WRITE};
     brion::SpikeReport receiver{emitter.getURI()};
-    lunchbox::sleep(STARTUP_DELAY);
+    extra::sleep(STARTUP_DELAY);
 
     BOOST_CHECK_THROW(receiver.write(brion::Spikes{}), std::runtime_error);
 }
@@ -83,7 +85,7 @@ BOOST_AUTO_TEST_CASE(write_read)
 {
     brion::SpikeReport emitter{uri, brion::MODE_WRITE};
     brion::SpikeReport receiver{emitter.getURI()};
-    lunchbox::sleep(STARTUP_DELAY);
+    extra::sleep(STARTUP_DELAY);
 
     std::thread writeThread{[&emitter] {
         for (const brion::Spike& spike : getTestSpikes())
@@ -123,7 +125,7 @@ BOOST_AUTO_TEST_CASE(write_read_until)
 {
     brion::SpikeReport emitter{uri, brion::MODE_WRITE};
     brion::SpikeReport receiver{emitter.getURI()};
-    lunchbox::sleep(STARTUP_DELAY);
+    extra::sleep(STARTUP_DELAY);
 
     std::thread writeThread{[&emitter] {
         for (const brion::Spike& spike : getTestSpikes())
@@ -153,7 +155,7 @@ BOOST_AUTO_TEST_CASE(seek)
 {
     brion::SpikeReport emitter{uri, brion::MODE_WRITE};
     brion::SpikeReport receiver{emitter.getURI()};
-    lunchbox::sleep(STARTUP_DELAY);
+    extra::sleep(STARTUP_DELAY);
 
     std::thread writeThread{[&emitter] {
 
@@ -180,7 +182,7 @@ BOOST_AUTO_TEST_CASE(write_read_filtered)
     brion::SpikeReport emitter{uri, brion::MODE_WRITE};
     brion::SpikeReport receiver{emitter.getURI(), {20, 22}};
 
-    lunchbox::sleep(STARTUP_DELAY);
+    extra::sleep(STARTUP_DELAY);
     std::thread writeThread{[&emitter] {
         for (const brion::Spike& spike : getTestSpikes())
         {
@@ -217,7 +219,7 @@ BOOST_AUTO_TEST_CASE(write_read_until_filtered)
 {
     brion::SpikeReport emitter{uri, brion::MODE_WRITE};
     brion::SpikeReport receiver{emitter.getURI(), {20, 22}};
-    lunchbox::sleep(STARTUP_DELAY);
+    extra::sleep(STARTUP_DELAY);
 
     std::thread writeThread{[&emitter] {
         for (const brion::Spike& spike : getTestSpikes())
@@ -245,7 +247,7 @@ BOOST_AUTO_TEST_CASE(simultaneous_read)
 {
     brion::SpikeReport emitter{uri, brion::MODE_WRITE};
     brion::SpikeReport receiver{emitter.getURI()};
-    lunchbox::sleep(STARTUP_DELAY);
+    extra::sleep(STARTUP_DELAY);
 
     auto spikes = receiver.read(brion::UNDEFINED_TIMESTAMP);
 
@@ -259,7 +261,7 @@ BOOST_AUTO_TEST_CASE(invalid_read)
 {
     brion::SpikeReport emitter{uri, brion::MODE_WRITE};
     brion::SpikeReport receiver{emitter.getURI()};
-    lunchbox::sleep(STARTUP_DELAY);
+    extra::sleep(STARTUP_DELAY);
 
     std::thread writeThread{[&emitter] {
         for (const brion::Spike& spike : getTestSpikes())
@@ -296,7 +298,7 @@ BOOST_AUTO_TEST_CASE(forward)
             .string();
 
     auto destinationSpikesFile =
-        "/tmp/" + lunchbox::make_UUID().getString() + ".gdf";
+        "/tmp/" + servus::make_UUID().getString() + ".gdf";
 
     {
         brion::SpikeReport sourceReport{brion::URI{sourceSpikesFile}};
@@ -305,7 +307,7 @@ BOOST_AUTO_TEST_CASE(forward)
         brion::SpikeReport writer{brion::URI{destinationSpikesFile},
                                   brion::MODE_WRITE};
 
-        lunchbox::sleep(STARTUP_DELAY);
+        extra::sleep(STARTUP_DELAY);
 
         std::thread fileToStreamThread{[&sourceReport, &emitter] {
             float t = NEST_SPIKES_START_TIME;
@@ -356,7 +358,7 @@ BOOST_AUTO_TEST_CASE(interrupt)
     brion::SpikeReport receiver{emitter.getURI()};
 
     auto future = receiver.read(100);
-    lunchbox::sleep(100);
+    extra::sleep(100);
     receiver.interrupt();
     BOOST_CHECK_THROW(future.get(), std::runtime_error);
 

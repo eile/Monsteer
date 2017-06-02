@@ -55,7 +55,7 @@ public:
             for (size_t i = 0; i < percentageCount; ++i)
                 _eventPort->insertEvent(_runtime->time(),
                                         MUSIC::GlobalIndex(_cellShuffle[i]));
-            lunchbox::sleep(MUSIC_TIMESTEP * 1000);
+            extra::sleep(MUSIC_TIMESTEP * 1000);
             _runtime->tick();
         }
         _runtime->finalize();

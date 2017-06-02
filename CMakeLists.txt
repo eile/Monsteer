@@ -28,6 +28,7 @@ common_find_package(Boost REQUIRED COMPONENTS filesystem serialization system
                                          program_options thread
                                          unit_test_framework)
 common_find_package(Brion 2 REQUIRED)
+common_find_package(Extra REQUIRED)
 common_find_package(Lexis)
 common_find_package(Lunchbox REQUIRED)
 common_find_package(MPI)
